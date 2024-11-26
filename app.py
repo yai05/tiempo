@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 import os
-from modelo import WeatherModel  # Asegúrate de que el archivo se llame modelo.py
+from Modelo import WeatherModel  # Asegúrate de que el archivo se llame Modelo.py
 
 # Cargar variables de entorno desde el archivo .env
 load_dotenv()
