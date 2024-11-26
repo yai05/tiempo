@@ -1,11 +1,19 @@
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 import os
-load_dotenv()
+from weather_model import WeatherModel  # Asegúrate de que el archivo se llame weather_model.py
 
+# Cargar variables de entorno desde el archivo .env
+load_dotenv()
 
 # Crear la aplicación Flask
 app = Flask(__name__)
+
+# Configurar Flask usando las variables de entorno
+app.config['DEBUG'] = os.getenv('FLASK_DEBUG') == 'True'
+
+# Instanciar el modelo del clima
+weather_model = WeatherModel()
 
 # Definir rutas (endpoints)
 @app.route("/")
@@ -29,6 +37,27 @@ def saludo(nombre):
         "status": "success"
     })
 
+@app.route("/clima/<ciudad>")
+def clima(ciudad):
+    """
+    Ruta que retorna los datos del clima para una ciudad específica
+    
+    Args:
+        ciudad (str): Nombre de la ciudad
+    """
+    weather_data = weather_model.get_weather(ciudad)
+    if weather_data:
+        return jsonify({
+            "mensaje": "Datos del clima obtenidos exitosamente.",
+            "status": "success",
+            "data": weather_data
+        })
+    else:
+        return jsonify({
+            "mensaje": "No se pudo obtener datos del clima para la ciudad especificada.",
+            "status": "error"
+        }), 404
+
 @app.errorhandler(404)
 def not_found(error):
     """Manejador para errores 404"""
@@ -47,4 +76,4 @@ def server_error(error):
 
 # Ejecutar la aplicación
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
